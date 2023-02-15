@@ -4,16 +4,6 @@ const cors = require('cors');
 const connection = require("./connection");
 const authRoute = require('./routes/authentication');
 
-var corsOptions = {
-    origin: 'http://localhost:3000',
-}
-
-
-
-
-
-
-
 const app = express();
 
 app.use(express.urlencoded({extended:  true}));
