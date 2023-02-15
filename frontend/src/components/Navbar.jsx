@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Navbar = () => {
+const Navbar = ({ user }) => {
   return (
     <>
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -12,6 +12,8 @@ const Navbar = () => {
     </button>
     <div className="collapse navbar-collapse" id="navbarSupportedContent">
       <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+        {!user  && 
+        <>
         <li className="nav-item">
           <Link className="nav-link active" aria-current="page" to="/">Home</Link>
         </li>
@@ -21,6 +23,17 @@ const Navbar = () => {
         <li className="nav-item">
           <Link className="nav-link active" aria-current="page" to="/signup">Signup</Link>
         </li>
+        </>}
+        {user  && 
+        <>
+        <li className="nav-item">
+          <Link className="nav-link active" aria-current="page" to="#">{user.name}</Link>
+        </li>
+        <li className="nav-item">
+          <Link className="nav-link active" aria-current="page" to="/logout">Log out</Link>
+        </li>
+        </>}
+
       </ul>
     </div>
   </div>
