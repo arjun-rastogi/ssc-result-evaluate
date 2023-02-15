@@ -1,6 +1,9 @@
 import React, {useState} from 'react';
 import Joi from 'joi-browser';
 import Input from './../common/input';
+import * as userService from "../services/userService";
+import auth from '../services/authServices';
+
 
 const Signup = () => {
    const [account, setAccount] = useState({
@@ -35,14 +38,26 @@ const Signup = () => {
      return error ? error.details[0].message :  null;
    };
 
-   const handleSubmit = e => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const errors = validate();
-    console.log(errors);
     setErrors(errors || {});
+
     if (errors) return;
-    console.log("Submitted data");
+    try {
+      const response = await userService.register(account);
+      auth.loginWithJwt(response.headers["x-auth-token"]);
+      window.location = "/dashboard";      
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...errors };
+        errors.username = ex.response.data;
+        setErrors({ errors });
+      }
+    }
   };  
+  
 
   const handleChange= ({ currentTarget : input}) => {
 
@@ -99,7 +114,7 @@ const Signup = () => {
 
         </div>
         <div className="col-md-6 offset-md-3 mt-3">
-           <button type="button" class="btn btn-outline-primary">Submit</button>
+           <button type="submit" class="btn btn-outline-primary">Submit</button>
         </div>
 
       </div>
