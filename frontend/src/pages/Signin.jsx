@@ -77,7 +77,7 @@ const Signin = () => {
 
       <div className="row">
         <div className="col-md-6 offset-md-3">
-         <h5>Sign in for New User</h5>
+         <h5>Sign in for Existing User</h5>
         </div>
         <div className="col-md-6 offset-md-3">
         <Input 
