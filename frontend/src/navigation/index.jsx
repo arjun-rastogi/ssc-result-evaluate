@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "./../components/Navbar";
-import Footer from "./../components/Footer";
+import { Navbar, Footer } from "./../components/";
 import AuthRoute from "./authRoute";
 import UserRoute from "./userRoute";
 import "bootstrap/dist/css/bootstrap.min.css";

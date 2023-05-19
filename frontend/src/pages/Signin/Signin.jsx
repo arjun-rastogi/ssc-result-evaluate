@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import Joi from "joi-browser";
-import Input from "./../common/input";
-import * as userService from "../services/userService";
-import auth from "../services/authServices";
+import Input from "./../../common/input";
+import auth from "../../services/authServices";
 
-const Signup = () => {
+const Signin = () => {
   const [account, setAccount] = useState({
-    name: "",
     email: "",
     password: "",
   });
@@ -14,7 +12,6 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
 
   const schema = {
-    name: Joi.optional().allow(""),
     email: Joi.string()
       .email({ tlds: { allow: false } })
       .required()
@@ -41,19 +38,19 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const errors = validate();
+    console.log(errors);
     setErrors(errors || {});
-
     if (errors) return;
+
     try {
-      const response = await userService.register(account);
-      auth.loginWithJwt(response.data.token);
+      const data = account;
+      await auth.login(data.email, data.password);
       window.location = "/dashboard";
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         const errors = { ...errors };
-        errors.username = ex.response.data;
+        errors.email = ex.response.data;
         setErrors({ errors });
       }
     }
@@ -71,7 +68,7 @@ const Signup = () => {
     setErrors(error);
   };
 
-  const { name, email, password } = account;
+  const { email, password } = account;
 
   return (
     <>
@@ -79,16 +76,7 @@ const Signup = () => {
         <form onSubmit={handleSubmit}>
           <div className="row">
             <div className="col-md-6 offset-md-3">
-              <h5>Sign up for New User</h5>
-            </div>
-            <div className="col-md-6 offset-md-3">
-              <Input
-                name="name"
-                label="Username"
-                value={name}
-                error={errors.name}
-                onChange={handleChange}
-              />
+              <h5>Sign in for Existing User</h5>
             </div>
             <div className="col-md-6 offset-md-3">
               <Input
@@ -120,4 +108,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Signin;

@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 const Footer = () => {
   return (
@@ -8,7 +8,7 @@ const Footer = () => {
         <h6 className="text-center">React BoilerPlate @ Arjun Rastogi</h6>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;
