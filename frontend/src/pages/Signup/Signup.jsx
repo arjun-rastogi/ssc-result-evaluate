@@ -1,53 +1,24 @@
 import React, { useState } from "react";
 import Joi from "joi-browser";
-import Input from "./../../common/input";
 import auth from "../../services/authServices";
 import * as userService from "../../services/userService";
+import Form from "../../common/form";
 
 const Signup = () => {
-  const [account, setAccount] = useState({
+  const initialData = {
     name: "",
     email: "",
     password: "",
-  });
+  };
 
+  const [data, setData] = useState(initialData);
   const [errors, setErrors] = useState({});
 
-  const schema = {
-    name: Joi.optional().allow(""),
-    email: Joi.string()
-      .email({ tlds: { allow: false } })
-      .required()
-      .label("Email"),
-    password: Joi.string().required().min(5).label("Password"),
-  };
-
-  const validate = () => {
-    const options = { abortEarly: false };
-    const { error } = Joi.validate(account, schema, options);
-    if (!error) return null;
-
-    const errors = {};
-    for (let item of error.details) errors[item.path[0]] = item.message;
-    return errors;
-  };
-
-  const validateProperty = ({ name, value }) => {
-    const obj = { [name]: value };
-    const schemas = { [name]: schema[name] };
-    const { error } = Joi.validate(obj, schemas);
-    return error ? error.details[0].message : null;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const errors = validate();
-    setErrors(errors || {});
-
-    if (errors) return;
+  const doSubmit = async () => {
+    // Call the server
+    console.log("Submitted", data);
     try {
-      const response = await userService.register(account);
+      const response = await userService.register(data);
       auth.loginWithJwt(response.data.token);
       window.location = "/dashboard";
     } catch (ex) {
@@ -59,62 +30,41 @@ const Signup = () => {
     }
   };
 
-  const handleChange = ({ currentTarget: input }) => {
-    const error = { ...errors };
-    const errorMessage = validateProperty(input);
-    if (errorMessage) error[input.name] = errorMessage;
-    else delete error[input.name];
-
-    const accounts = { ...account };
-    accounts[input.name] = input.value;
-    setAccount(accounts);
-    setErrors(error);
+  const schema = {
+    name: Joi.optional().allow(""),
+    email: Joi.string()
+      .email({ tlds: { allow: false } })
+      .required()
+      .label("Email"),
+    password: Joi.string().required().min(5).label("Password"),
   };
 
-  const { name, email, password } = account;
+  const { renderInput, renderButton, handleSubmit } = Form({
+    data,
+    setData,
+    errors,
+    setErrors,
+    schema,
+    onSubmit: doSubmit,
+  });
 
   return (
     <>
       <div className="container vh-100">
-        <form onSubmit={handleSubmit}>
-          <div className="row">
-            <div className="col-md-6 offset-md-3">
-              <h5>Sign up for New User</h5>
-            </div>
-            <div className="col-md-6 offset-md-3">
-              <Input
-                name="name"
-                label="Username"
-                value={name}
-                error={errors.name}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="col-md-6 offset-md-3">
-              <Input
-                name="email"
-                label="Email"
-                value={email}
-                error={errors.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="col-md-6 offset-md-3">
-              <Input
-                name="password"
-                label="Password"
-                value={password}
-                error={errors.password}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="col-md-6 offset-md-3 mt-3">
-              <button type="submit" class="btn btn-outline-primary">
-                Submit
-              </button>
-            </div>
+        <div className="row">
+          <div className="col-md-6 offset-md-3">
+            <h5>Sign up for New User</h5>
           </div>
-        </form>
+          <div className="col-md-6 offset-md-3">
+            <form onSubmit={handleSubmit} className="forms-sample">
+              {renderInput("name", "User Name")}
+              {renderInput("email", "Email")}
+              {renderInput("password", "Password", "password")}
+              {renderButton("Save")}
+              <p>&nbsp;</p>
+            </form>
+          </div>
+        </div>
       </div>
     </>
   );
