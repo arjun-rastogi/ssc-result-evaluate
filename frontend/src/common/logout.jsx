@@ -6,6 +6,7 @@ const Logout = () => {
     auth.logout();
     window.location = "/";
   });
+
   return null;
 };
 
