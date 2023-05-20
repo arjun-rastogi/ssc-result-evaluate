@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 
 exports.Signup = async (req, res, next) => {
   try {
+    const { name, email, password } = req.body; // Assuming you're extracting the values from the request body
+
     let hashedPassword = await bcrypt.hash(password, 10);
     let query = "INSERT INTO USERS (name, email, password) VALUES (?, ?, ?)";
     connection.query(query, [name, email, hashedPassword], (err, results) => {
