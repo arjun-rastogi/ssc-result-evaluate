@@ -1,12 +1,8 @@
-const express = require("express");
 const connection = require("../connection");
-const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-// Signup API for creating user
-router.post("/signup", async (req, res, next) => {
-  let { name, email, password } = req.body;
+exports.Signup = async (req, res, next) => {
   try {
     let hashedPassword = await bcrypt.hash(password, 10);
     let query = "INSERT INTO USERS (name, email, password) VALUES (?, ?, ?)";
@@ -28,11 +24,9 @@ router.post("/signup", async (req, res, next) => {
     console.error(error);
     res.status(500).json({ message: "Unable to sign up." });
   }
-});
+};
 
-// Signin API for validating user
-
-router.post("/signin", async (req, res, next) => {
+exports.Signin = async (req, res, next) => {
   let { email, password } = req.body;
   try {
     let query = "SELECT * FROM USERS WHERE email = ?";
@@ -65,6 +59,4 @@ router.post("/signin", async (req, res, next) => {
     console.error(error);
     res.status(500).json({ message: "Unable to sign in." });
   }
-});
-
-module.exports = router;
+};
