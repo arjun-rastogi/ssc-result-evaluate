@@ -6,7 +6,7 @@ function App() {
   useEffect(() => {
     // Fetch the results from the server when the component mounts
     axios
-      .get("http://localhost:3001/fetch-results")
+      .get("https://ssc-result-api.onrender.com/fetch-results")
       .then((res) => setResults(res.data));
   }, []);
 
