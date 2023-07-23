@@ -22,45 +22,62 @@ app.get("/fetch-results", async (req, res) => {
     "https://ssc.digialm.com//per/g27/pub/2207/touchstone/AssessmentQPHTMLMode1//2207O23158/2207O23158S5D31137/16885362528197116/5311016448_2207O23158S5D31137E3.html"
   );
 
-  const results = await page.evaluate(() => {
-    var right = 0;
-    var notAttempted = 0;
+  const data = await page.evaluate(() => {
+    const container = document.querySelector(".grp-cntnr");
+    const rows = container.querySelectorAll(".section-cntnr");
+    const extractedData = [];
 
-    for (var i = 0; i < 100; i++) {
-      if (
-        document
-          .getElementsByClassName("question-pnl")
-          [i].getElementsByClassName("bold")[5].textContent === " -- "
-      ) {
-        notAttempted++;
+    rows.forEach((row) => {
+      const h1Element = row.querySelector(".bold");
+      const colElements = row.querySelectorAll(".question-pnl");
+
+      const section = h1Element.textContent;
+      const Unattempted = Array.from(colElements).map((col) => {
+        const boldElements1 = col.querySelectorAll(".bold");
+        if (boldElements1.length >= 6) {
+          return boldElements1[5].textContent;
+        } else {
+          return "N/A"; // If there are fewer than 6 elements with class .bold, handle appropriately
+        }
+      });
+      const attempted = Array.from(colElements).map((col) => {
+        const boldElements1 = col.querySelectorAll(".rightAns");
+        const boldElements2 = col.querySelectorAll(".bold");
+        if (boldElements1.length >= 1) {
+          let attemptCoorect =
+            boldElements1[0].textContent[0] === boldElements2[5].textContent
+              ? "Correct"
+              : "Wrong";
+          return attemptCoorect;
+        } else {
+          return "N/A"; // If there are fewer than 6 elements with class .bold, handle appropriately
+        }
+      });
+
+      let notAttempted = 0;
+      for (let i = 0; i < Unattempted.length; i++) {
+        if (Unattempted[i] === " -- ") {
+          notAttempted++;
+        }
       }
-
-      if (
-        document
-          .getElementsByClassName("question-pnl")
-          [i].getElementsByClassName("rightAns")[0].textContent[0] ===
-        document
-          .getElementsByClassName("question-pnl")
-          [i].getElementsByClassName("bold")[5].textContent
-      ) {
-        right++;
+      let Attempted = 0;
+      for (let i = 0; i < attempted.length; i++) {
+        if (attempted[i] === "Correct") {
+          Attempted++;
+        }
       }
-    }
+      var wrong = 25 - notAttempted - Attempted;
+      var marks = Attempted * 2 - wrong * 0.5;
 
-    var wrong = 100 - notAttempted - right;
-    var marks = right * 2 - wrong * 0.5;
+      extractedData.push({ section, notAttempted, Attempted, wrong, marks });
+    });
 
-    return {
-      Attempted: 100 - notAttempted,
-      "Right Answers": right,
-      "Wrong Answers": wrong,
-      Marks: marks,
-    };
+    return extractedData;
   });
 
   await browser.close();
 
-  res.json(results);
+  res.json(data);
 });
 
 const port = 3001; // Choose any port number you prefer
