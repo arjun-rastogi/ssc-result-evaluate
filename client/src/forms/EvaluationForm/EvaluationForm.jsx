@@ -16,7 +16,7 @@ const EvaluationForm = () => {
     console.log("Submitted", data);
     try {
       const response = await axios.post(
-        "http://localhost:3001/fetch-results",
+        "https://ssc-result-api.onrender.com/fetch-results",
         data
       );
       const responseData = response.data;
